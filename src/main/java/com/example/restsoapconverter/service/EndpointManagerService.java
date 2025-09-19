@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.restsoapconverter.service.SoapEndpointRegistrationService;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,6 +33,9 @@ public class EndpointManagerService {
 
     @Autowired
     private MappingRepository mappingRepository;
+
+    @Autowired
+    private SoapEndpointRegistrationService soapEndpointRegistrationService;
 
     public EndpointResponse createEndpoint(EndpointCreateRequest request, String correlationId) {
         logger.info("Creating endpoint: name={}, correlationId={}", request.getName(), correlationId);
@@ -55,6 +59,9 @@ public class EndpointManagerService {
 
         // Create mappings
         createMappings(endpoint, request.getMappings(), correlationId);
+
+        // ADD THIS NEW LINE - Register SOAP endpoint
+        soapEndpointRegistrationService.registerSoapEndpoint(endpoint);
 
         logger.info("Created endpoint: id={}, correlationId={}", endpoint.getId(), correlationId);
         return mapToEndpointResponse(endpoint);
@@ -103,9 +110,12 @@ public class EndpointManagerService {
     public boolean deleteEndpoint(Long id, String correlationId) {
         logger.info("Deleting endpoint: id={}, correlationId={}", id, correlationId);
 
-        if (!soapEndpointRepository.existsById(id)) {
+        Optional<SoapEndpoint> endpointOpt = soapEndpointRepository.findById(id);
+        if (!endpointOpt.isPresent()) {
             return false;
         }
+        
+        soapEndpointRegistrationService.unregisterSoapEndpoint(endpointOpt.get());
 
         soapEndpointRepository.deleteById(id);
         return true;
@@ -146,7 +156,9 @@ public class EndpointManagerService {
 
     // Private helper methods
     private void createRestCalls(SoapEndpoint endpoint, List<RestCallConfig> restCallConfigs, String correlationId) {
-        if (restCallConfigs == null) return;
+        if (restCallConfigs == null) {
+            return;
+        }
 
         for (RestCallConfig config : restCallConfigs) {
             RestCall restCall = new RestCall();
@@ -163,7 +175,9 @@ public class EndpointManagerService {
     }
 
     private void createMappings(SoapEndpoint endpoint, List<MappingConfig> mappingConfigs, String correlationId) {
-        if (mappingConfigs == null) return;
+        if (mappingConfigs == null) {
+            return;
+        }
 
         for (MappingConfig config : mappingConfigs) {
             Mapping mapping = new Mapping();
