@@ -49,13 +49,6 @@ public class ExecutionEngineService {
 
         Map<String, Object> results = new ConcurrentHashMap<>();
 
-        if (endpoint.getRestCalls() == null || endpoint.getRestCalls().isEmpty()) {
-            logger.error("❌ ERROR: No REST calls configured for endpoint: {}", endpoint.getName());
-            throw new IllegalStateException("No REST calls configured");
-        }
-
-        // Map<String, Object> results = new ConcurrentHashMap<>();
-
         // Execute REST calls
         for (RestCall restCall : reloadedEndpoint.getRestCalls()) {
             logger.info("🔍 DEBUG: Processing REST call: sequenceOrder={}, template={}",
