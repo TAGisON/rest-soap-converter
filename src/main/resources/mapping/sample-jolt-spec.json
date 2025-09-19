@@ -1,0 +1,22 @@
+{
+  "spec": [
+    {
+      "operation": "shift",
+      "spec": {
+        "call_1": {
+          "body": {
+            "*": "data.&"
+          },
+          "statusCode": "status"
+        }
+      }
+    },
+    {
+      "operation": "default",
+      "spec": {
+        "status": 200,
+        "message": "Success"
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+             xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+             xmlns:tns="http://example.com/sample"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             targetNamespace="http://example.com/sample">
+
+    <types>
+        <xsd:schema targetNamespace="http://example.com/sample">
+            <xsd:element name="SampleRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="id" type="xsd:string"/>
+                        <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="SampleResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="data" type="xsd:string"/>
+                        <xsd:element name="status" type="xsd:int"/>
+                        <xsd:element name="message" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </types>
+
+    <message name="SampleRequestMessage">
+        <part name="parameters" element="tns:SampleRequest"/>
+    </message>
+
+    <message name="SampleResponseMessage">
+        <part name="parameters" element="tns:SampleResponse"/>
+    </message>
+
+    <portType name="SamplePortType">
+        <operation name="SampleOperation">
+            <input message="tns:SampleRequestMessage"/>
+            <output message="tns:SampleResponseMessage"/>
+        </operation>
+    </portType>
+
+    <binding name="SampleSoapBinding" type="tns:SamplePortType">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="SampleOperation">
+            <soap:operation soapAction="http://example.com/sample/SampleOperation"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+    </binding>
+
+    <service name="SampleService">
+        <port name="SamplePort" binding="tns:SampleSoapBinding">
+            <soap:address location="http://localhost:8080/ws/sample"/>
+        </port>
+    </service>
+
+</definitions>
