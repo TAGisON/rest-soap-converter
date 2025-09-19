@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://afcao.personnel.service"
+           xmlns:tns="http://afcao.personnel.service"
+           elementFormDefault="qualified">
+
+    <!-- Personnel Data Request -->
+    <xs:element name="GetPersonnelDataRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="serviceNumber" type="xs:long"/>
+                <xs:element name="category" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Personnel Data Response -->
+    <xs:element name="GetPersonnelDataResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:int"/>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="personnelData" type="tns:PersonnelInfo" minOccurs="0"/>
+                <xs:element name="responseMetadata" type="tns:ResponseMetadata" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <!-- Personnel Information Complex Type -->
+    <xs:complexType name="PersonnelInfo">
+        <xs:sequence>
+            <xs:element name="serviceNumber" type="xs:long"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="rankCode" type="xs:int"/>
+            <xs:element name="rankType" type="xs:string" minOccurs="0"/>
+            <xs:element name="rankDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="unitCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="tradeCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="dateOfBirth" type="xs:string" minOccurs="0"/>
+            <xs:element name="gender" type="xs:string" minOccurs="0"/>
+            <xs:element name="maritalStatus" type="xs:string" minOccurs="0"/>
+            <xs:element name="enrollmentDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="panNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="irlaNumber" type="xs:long" minOccurs="0"/>
+            <xs:element name="category" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Response Metadata Complex Type -->
+    <xs:complexType name="ResponseMetadata">
+        <xs:sequence>
+            <xs:element name="count" type="xs:int"/>
+            <xs:element name="hasMore" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Fault Element -->
+    <xs:element name="PersonnelDataFault">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="faultCode" type="xs:string"/>
+                <xs:element name="faultString" type="xs:string"/>
+                <xs:element name="correlationId" type="xs:string" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>
