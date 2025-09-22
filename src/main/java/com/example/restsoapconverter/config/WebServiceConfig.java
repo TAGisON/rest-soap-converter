@@ -29,22 +29,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         servlet.setTransformWsdlLocations(true);
         return new ServletRegistrationBean<>(servlet, "/ws/*");
     }
-
-    @Bean(name = "personnel")
-    public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema personnelSchema) {
-        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("PersonnelPort");
-        wsdl11Definition.setLocationUri("/ws");
-        wsdl11Definition.setTargetNamespace("http://afcao.personnel.service");
-        wsdl11Definition.setSchema(personnelSchema);
-        return wsdl11Definition;
-    }
-
-    @Bean
-    public XsdSchema personnelSchema() {
-        return new SimpleXsdSchema(new ClassPathResource("xsd/personnel.xsd"));
-    }
-
+    
     @Override
     public void addInterceptors(List<EndpointInterceptor> interceptors) {
         PayloadLoggingInterceptor loggingInterceptor = new PayloadLoggingInterceptor();

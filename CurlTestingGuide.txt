@@ -1,0 +1,537 @@
+
+=============================================================
+🎯 SERVICE NUMBER CHECK ENDPOINTS SETUP
+=============================================================
+
+✅ CheckServiceNoOPW → Returns 0 if service exists in OPW, 1 if not
+✅ CheckServiceNoAPW → Returns 0 if service exists in APW, 1 if not
+✅ CheckServiceNoCPW → Returns 0 if service exists in CPW, 1 if not
+
+RETURN VALUES:
+- 0 = Service number exists (data found)
+- 1 = Service number doesn't exist (no data/error)
+
+=============================================================
+STEP 1: REGISTER CHECK ENDPOINTS
+=============================================================
+
+🚀 1. REGISTER OPW CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckServiceNoOPWEndpoint",
+    "operationName": "CheckServiceNoOPW",
+    "namespace": "http://afcao.payslip.opw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 2. REGISTER APW CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckServiceNoAPWEndpoint",
+    "operationName": "CheckServiceNoAPW",
+    "namespace": "http://afcao.payslip.apw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 3. REGISTER CPW CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckServiceNoCPWEndpoint",
+    "operationName": "CheckServiceNoCPW",
+    "namespace": "http://afcao.payslip.cpw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+=============================================================
+STEP 2: TEST CHECK ENDPOINTS
+=============================================================
+
+🧪 1. TEST OPW SERVICE CHECK:
+curl --location 'http://localhost:8080/ws/CheckServiceNoOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.check.service/CheckServiceNoOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:CheckServiceNoOPWRequest>
+      <opw:serviceNumber>26607</opw:serviceNumber>
+    </opw:CheckServiceNoOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (if service exists):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <CheckServiceNoOPWResponse xmlns="http://afcao.payslip.opw.check.service">
+           <return>0</return>
+        </CheckServiceNoOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+Expected Response (if service doesn't exist):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <CheckServiceNoOPWResponse xmlns="http://afcao.payslip.opw.check.service">
+           <return>1</return>
+        </CheckServiceNoOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 2. TEST APW SERVICE CHECK:
+curl --location 'http://localhost:8080/ws/CheckServiceNoAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.check.service/CheckServiceNoAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:CheckServiceNoAPWRequest>
+      <apw:serviceNumber>26607</apw:serviceNumber>
+    </apw:CheckServiceNoAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+🧪 3. TEST CPW SERVICE CHECK:
+curl --location 'http://localhost:8080/ws/CheckServiceNoCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.check.service/CheckServiceNoCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:CheckServiceNoCPWRequest>
+      <cpw:serviceNumber>26607</cpw:serviceNumber>
+    </cpw:CheckServiceNoCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+=============================================================
+TESTING SCENARIOS
+=============================================================
+
+✅ VALID SERVICE NUMBER:
+- Input: <serviceNumber>26607</serviceNumber>
+- API Response: {"items":[{...data...}],"count":1}
+- SOAP Response: <return>0</return>
+
+❌ INVALID SERVICE NUMBER:
+- Input: <serviceNumber>99999</serviceNumber>
+- API Response: {"items":[],"count":0} OR HTTP error
+- SOAP Response: <return>1</return>
+
+❌ NETWORK ERROR:
+- API Response: Timeout/Connection error
+- SOAP Response: <return>1</return>
+
+❌ MISSING PARAMETER:
+- Input: Missing serviceNumber
+- SOAP Response: <return>1</return>
+
+=============================================================
+VERIFICATION COMMANDS
+=============================================================
+
+🔍 List all endpoints (should show 15 total now):
+curl http://localhost:8080/admin/endpoints
+
+🔍 Test with existing service number:
+- CheckServiceNoOPW with 26607 → should return 0
+- CheckServiceNoAPW with 26607 → should return 0 or 1 depending on data
+- CheckServiceNoCPW with 26607 → should return 0 or 1 depending on data
+
+🔍 Test with non-existing service number:
+- CheckServiceNoOPW with 99999 → should return 1
+- CheckServiceNoAPW with 99999 → should return 1
+- CheckServiceNoCPW with 99999 → should return 1
+
+
+=============================================================
+🎯 COMPLETE PAYSLIP ENDPOINTS TESTING SETUP
+=============================================================
+
+ENDPOINT SUMMARY:
+- 3 OPW endpoints (category=0): GetTotalCreditOPW, GetTotalDebitOPW, GetNetPayOPW
+- 3 APW endpoints (category=1): GetTotalCreditAPW, GetTotalDebitAPW, GetNetPayAPW
+- 3 CPW endpoints (category=2): GetTotalCreditCPW, GetTotalDebitCPW, GetNetPayCPW
+
+✅ Request Format: Only serviceNumber needed (category auto-added)
+✅ Response Format: <return>VALUE_OR_-1</return>
+
+=============================================================
+STEP 1: REGISTER ALL ENDPOINTS
+=============================================================
+
+🚀 1. REGISTER OPW TOTAL CREDIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipOPWTotalCreditEndpoint",
+    "operationName": "GetTotalCreditOPW",
+    "namespace": "http://afcao.payslip.opw.totalcredit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 2. REGISTER OPW TOTAL DEBIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipOPWTotalDebitEndpoint",
+    "operationName": "GetTotalDebitOPW",
+    "namespace": "http://afcao.payslip.opw.totaldebit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 3. REGISTER OPW NET PAY:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipOPWNetPayEndpoint",
+    "operationName": "GetNetPayOPW",
+    "namespace": "http://afcao.payslip.opw.netpay.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 4. REGISTER APW TOTAL CREDIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipAPWTotalCreditEndpoint",
+    "operationName": "GetTotalCreditAPW",
+    "namespace": "http://afcao.payslip.apw.totalcredit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 5. REGISTER APW TOTAL DEBIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipAPWTotalDebitEndpoint",
+    "operationName": "GetTotalDebitAPW",
+    "namespace": "http://afcao.payslip.apw.totaldebit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 6. REGISTER APW NET PAY:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipAPWNetPayEndpoint",
+    "operationName": "GetNetPayAPW",
+    "namespace": "http://afcao.payslip.apw.netpay.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 7. REGISTER CPW TOTAL CREDIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipCPWTotalCreditEndpoint",
+    "operationName": "GetTotalCreditCPW",
+    "namespace": "http://afcao.payslip.cpw.totalcredit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 8. REGISTER CPW TOTAL DEBIT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipCPWTotalDebitEndpoint",
+    "operationName": "GetTotalDebitCPW",
+    "namespace": "http://afcao.payslip.cpw.totaldebit.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 9. REGISTER CPW NET PAY:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "PayslipCPWNetPayEndpoint",
+    "operationName": "GetNetPayCPW",
+    "namespace": "http://afcao.payslip.cpw.netpay.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/${category}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+=============================================================
+STEP 2: TEST SOAP ENDPOINTS
+=============================================================
+
+🧪 OPW SOAP TESTS (Category = 0):
+
+1. TEST OPW TOTAL CREDIT:
+curl --location 'http://localhost:8080/ws/GetTotalCreditOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.totalcredit.service/GetTotalCreditOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.totalcredit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetTotalCreditOPWRequest>
+      <opw:serviceNumber>26607</opw:serviceNumber>
+    </opw:GetTotalCreditOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+2. TEST OPW TOTAL DEBIT:
+curl --location 'http://localhost:8080/ws/GetTotalDebitOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.totaldebit.service/GetTotalDebitOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.totaldebit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetTotalDebitOPWRequest>
+      <opw:serviceNumber>26607</opw:serviceNumber>
+    </opw:GetTotalDebitOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+3. TEST OPW NET PAY:
+curl --location 'http://localhost:8080/ws/GetNetPayOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.netpay.service/GetNetPayOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.netpay.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetNetPayOPWRequest>
+      <opw:serviceNumber>26607</opw:serviceNumber>
+    </opw:GetNetPayOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+🧪 APW SOAP TESTS (Category = 1):
+
+4. TEST APW TOTAL CREDIT:
+curl --location 'http://localhost:8080/ws/GetTotalCreditAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.totalcredit.service/GetTotalCreditAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.totalcredit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetTotalCreditAPWRequest>
+      <apw:serviceNumber>26607</apw:serviceNumber>
+    </apw:GetTotalCreditAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+5. TEST APW TOTAL DEBIT:
+curl --location 'http://localhost:8080/ws/GetTotalDebitAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.totaldebit.service/GetTotalDebitAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.totaldebit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetTotalDebitAPWRequest>
+      <apw:serviceNumber>26607</apw:serviceNumber>
+    </apw:GetTotalDebitAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+6. TEST APW NET PAY:
+curl --location 'http://localhost:8080/ws/GetNetPayAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.netpay.service/GetNetPayAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.netpay.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetNetPayAPWRequest>
+      <apw:serviceNumber>26607</apw:serviceNumber>
+    </apw:GetNetPayAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+🧪 CPW SOAP TESTS (Category = 2):
+
+7. TEST CPW TOTAL CREDIT:
+curl --location 'http://localhost:8080/ws/GetTotalCreditCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.totalcredit.service/GetTotalCreditCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.totalcredit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetTotalCreditCPWRequest>
+      <cpw:serviceNumber>26607</cpw:serviceNumber>
+    </cpw:GetTotalCreditCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+8. TEST CPW TOTAL DEBIT:
+curl --location 'http://localhost:8080/ws/GetTotalDebitCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.totaldebit.service/GetTotalDebitCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.totaldebit.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetTotalDebitCPWRequest>
+      <cpw:serviceNumber>26607</cpw:serviceNumber>
+    </cpw:GetTotalDebitCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+9. TEST CPW NET PAY:
+curl --location 'http://localhost:8080/ws/GetNetPayCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.netpay.service/GetNetPayCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.netpay.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetNetPayCPWRequest>
+      <cpw:serviceNumber>26607</cpw:serviceNumber>
+    </cpw:GetNetPayCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+=============================================================
+EXPECTED RESPONSES
+=============================================================
+
+All endpoints should return this format:
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetTotalCreditOPWResponse xmlns="http://afcao.payslip.opw.totalcredit.service">
+           <return>295154</return>
+        </GetTotalCreditOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+Expected Values (based on your JSON):
+- Total Credit (gross_entitlement): 295154
+- Total Debit (gross_deductions): 145459
+- Net Pay (net_entitlement): 149695
+
+Error Response:
+<return>-1</return>
+
+=============================================================
+VERIFICATION COMMANDS
+=============================================================
+
+🔍 Check all registered endpoints:
+curl http://localhost:8080/admin/endpoints
+
+🔍 Test external APIs directly:
+curl "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/26607/0"
+curl "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/26607/1"
+curl "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/26607/2"
+
+🔍 Health check:
+curl http://localhost:8080/actuator/health

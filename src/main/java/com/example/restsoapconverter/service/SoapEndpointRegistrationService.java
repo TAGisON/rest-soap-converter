@@ -2,13 +2,12 @@ package com.example.restsoapconverter.service;
 
 import com.example.restsoapconverter.entity.SoapEndpoint;
 import com.example.restsoapconverter.repository.SoapEndpointRepository;
-import com.example.restsoapconverter.soap.DynamicSoapEndpoint;
+import com.example.restsoapconverter.soap.TrulyDynamicSoapEndpoint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.ws.server.endpoint.mapping.PayloadRootAnnotationMethodEndpointMapping;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -25,7 +24,7 @@ public class SoapEndpointRegistrationService {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private DynamicSoapEndpoint dynamicSoapEndpoint;
+    private TrulyDynamicSoapEndpoint trulyDynamicSoapEndpoint;
 
     @PostConstruct
     public void registerExistingEndpoints() {
@@ -44,13 +43,13 @@ public class SoapEndpointRegistrationService {
                    endpoint.getOperationName(), endpoint.getNamespace());
 
         // Register the endpoint with the dynamic handler
-        dynamicSoapEndpoint.registerEndpoint(endpoint);
+        trulyDynamicSoapEndpoint.registerEndpoint(endpoint);
 
         logger.info("Successfully registered SOAP endpoint: {}", endpoint.getOperationName());
     }
 
     public void unregisterSoapEndpoint(SoapEndpoint endpoint) {
         logger.info("Unregistering SOAP endpoint: {}", endpoint.getOperationName());
-        dynamicSoapEndpoint.unregisterEndpoint(endpoint);
+        trulyDynamicSoapEndpoint.unregisterEndpoint(endpoint);
     }
 }
