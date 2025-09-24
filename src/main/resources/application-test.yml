@@ -1,0 +1,31 @@
+
+# Test configuration - src/test/resources/application-test.yml
+spring:
+  application:
+    name: rest-soap-converter
+
+  # Use H2 in-memory database for tests
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+
+  # JPA configuration for tests
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.H2Dialect
+
+  # Disable Flyway for tests
+  flyway:
+    enabled: false
+
+# Database management configuration
+database:
+  auto-create: false  # Disable for tests
+
+logging:
+  level:
+    com.example.restsoapconverter: DEBUG

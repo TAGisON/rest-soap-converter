@@ -1,5 +1,4 @@
 
-
 package com.example.restsoapconverter.soap;
 
 import com.example.restsoapconverter.entity.SoapEndpoint;
@@ -62,7 +61,7 @@ public class TrulyDynamicSoapEndpoint {
         return handleDynamicRequest(request, "http://afcao.rankhistory.service", "GetRankHistoryData");
     }
 
-    // ============= OPW PAYSLIP ENDPOINTS (NEW) =============
+    // ============= OPW PAYSLIP ENDPOINTS =============
 
     @SoapAction("http://afcao.payslip.opw.totalcredit.service/GetTotalCreditOPW")
     @PayloadRoot(namespace = "http://afcao.payslip.opw.totalcredit.service", localPart = "GetTotalCreditOPWRequest")
@@ -88,7 +87,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipRequestWithCategory(request, "http://afcao.payslip.opw.netpay.service", "GetNetPayOPW", "net_entitlement", "0");
     }
 
-    // ============= APW PAYSLIP ENDPOINTS (NEW) =============
+    // ============= APW PAYSLIP ENDPOINTS =============
 
     @SoapAction("http://afcao.payslip.apw.totalcredit.service/GetTotalCreditAPW")
     @PayloadRoot(namespace = "http://afcao.payslip.apw.totalcredit.service", localPart = "GetTotalCreditAPWRequest")
@@ -114,7 +113,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipRequestWithCategory(request, "http://afcao.payslip.apw.netpay.service", "GetNetPayAPW", "net_entitlement", "1");
     }
 
-    // ============= CPW PAYSLIP ENDPOINTS (NEW) =============
+    // ============= CPW PAYSLIP ENDPOINTS =============
 
     @SoapAction("http://afcao.payslip.cpw.totalcredit.service/GetTotalCreditCPW")
     @PayloadRoot(namespace = "http://afcao.payslip.cpw.totalcredit.service", localPart = "GetTotalCreditCPWRequest")
@@ -140,6 +139,8 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipRequestWithCategory(request, "http://afcao.payslip.cpw.netpay.service", "GetNetPayCPW", "net_entitlement", "2");
     }
 
+    // ============= SERVICE NUMBER CHECK ENDPOINTS =============
+
     @SoapAction("http://afcao.payslip.opw.check.service/CheckServiceNoOPW")
     @PayloadRoot(namespace = "http://afcao.payslip.opw.check.service", localPart = "CheckServiceNoOPWRequest")
     @ResponsePayload
@@ -162,6 +163,190 @@ public class TrulyDynamicSoapEndpoint {
     public Element handleCheckServiceNoCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling CheckServiceNoCPW request");
         return handleServiceCheckRequestWithCategory(request, "http://afcao.payslip.cpw.check.service", "CheckServiceNoCPW", "2");
+    }
+
+    // ============= NEW TPIN CHECK ENDPOINTS =============
+
+    @SoapAction("http://afcao.tpin.opw.check.service/CheckTPINOPW")
+    @PayloadRoot(namespace = "http://afcao.tpin.opw.check.service", localPart = "CheckTPINOPWRequest")
+    @ResponsePayload
+    public Element handleCheckTPINOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling CheckTPINOPW request");
+        return handleTPINCheckRequestWithCategory(request, "http://afcao.tpin.opw.check.service", "CheckTPINOPW", "0");
+    }
+
+    @SoapAction("http://afcao.tpin.apw.check.service/CheckTPINAPW")
+    @PayloadRoot(namespace = "http://afcao.tpin.apw.check.service", localPart = "CheckTPINAPWRequest")
+    @ResponsePayload
+    public Element handleCheckTPINAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling CheckTPINAPW request");
+        return handleTPINCheckRequestWithCategory(request, "http://afcao.tpin.apw.check.service", "CheckTPINAPW", "1");
+    }
+
+    @SoapAction("http://afcao.tpin.cpw.check.service/CheckTPINCPW")
+    @PayloadRoot(namespace = "http://afcao.tpin.cpw.check.service", localPart = "CheckTPINCPWRequest")
+    @ResponsePayload
+    public Element handleCheckTPINCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling CheckTPINCPW request");
+        return handleTPINCheckRequestWithCategory(request, "http://afcao.tpin.cpw.check.service", "CheckTPINCPW", "2");
+    }
+
+    // ============= TPIN CHECK PROCESSING LOGIC =============
+
+    private Element handleTPINCheckRequestWithCategory(Element request, String namespace, String operationName, String category) {
+        try {
+            logger.info("🔐 Processing TPIN check request: operation={}, category={}", operationName, category);
+
+            // Extract parameters (serviceNumber and tpin expected)
+            Map<String, Object> parameters = extractParametersDynamically(request);
+            logger.info("🔍 Extracted parameters from request: {}", parameters);
+
+            // Validate required parameters
+            if (!parameters.containsKey("serviceNumber")) {
+                logger.error("❌ Missing required parameter: serviceNumber");
+                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for missing params
+            }
+
+            if (!parameters.containsKey("tpin")) {
+                logger.error("❌ Missing required parameter: tpin");
+                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for missing params
+            }
+
+            String inputTpin = (String) parameters.get("tpin");
+            String serviceNumber = (String) parameters.get("serviceNumber");
+
+            // Validate TPIN format (should be 4 digits)
+            if (inputTpin == null || inputTpin.trim().isEmpty()) {
+                logger.error("❌ TPIN is null or empty");
+                return createSimpleResponse(namespace, operationName, "1");
+            }
+
+            inputTpin = inputTpin.trim();
+            if (!inputTpin.matches("\\d{4}")) {
+                logger.error("❌ TPIN format invalid: '{}' (must be 4 digits)", inputTpin);
+                return createSimpleResponse(namespace, operationName, "1");
+            }
+
+            logger.info("🔐 TPIN validation request for serviceNumber: {}, category: {}", serviceNumber, category);
+
+            // Add category for API call
+            parameters.put("category", category);
+            logger.info("🔍 Added auto-category: {}. Final parameters: {}", category, parameters);
+
+            // Find registered endpoint
+            String key = namespace + "#" + operationName;
+            SoapEndpoint endpoint = registeredEndpoints.get(key);
+
+            if (endpoint == null) {
+                logger.error("❌ No registered endpoint found for: {}", key);
+                logger.info("Available endpoints: {}", registeredEndpoints.keySet());
+                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for endpoint not found
+            }
+
+            // Execute REST call to get TPIN details
+            Map<String, Object> result = executionEngineService.executeEndpoint(endpoint, parameters);
+
+            // Check TPIN match
+            String checkResult = checkTPINMatch(result, inputTpin, serviceNumber, category);
+            logger.info("✅ TPIN check result: {} for serviceNumber: {}, category: {} (0=match, 1=no match/error)",
+                    checkResult, serviceNumber, category);
+
+            return createSimpleResponse(namespace, operationName, checkResult);
+
+        } catch (Exception e) {
+            logger.error("❌ Error processing TPIN check request {}: {}", operationName, e.getMessage(), e);
+            return createSimpleResponse(namespace, operationName, "1"); // Return 1 for any error
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String checkTPINMatch(Map<String, Object> result, String inputTpin, String serviceNumber, String category) {
+        try {
+            logger.info("🔐 Checking TPIN match for serviceNumber: {}, category: {}", serviceNumber, category);
+
+            // Navigate through the result structure
+            if (result.containsKey("call_1")) {
+                Map<String, Object> call1 = (Map<String, Object>) result.get("call_1");
+
+                // Check status code first
+                if (call1.containsKey("statusCode")) {
+                    Integer statusCode = (Integer) call1.get("statusCode");
+                    logger.info("🔍 API response status code: {}", statusCode);
+
+                    if (statusCode != 200) {
+                        logger.warn("⚠️ API returned non-200 status: {} - TPIN check failed", statusCode);
+                        return "1"; // API error = TPIN check failed
+                    }
+                }
+
+                if (call1.containsKey("body")) {
+                    String jsonBody = (String) call1.get("body");
+                    logger.info("🔍 API response body length: {}", jsonBody != null ? jsonBody.length() : "NULL");
+
+                    if (jsonBody == null || jsonBody.trim().isEmpty()) {
+                        logger.warn("⚠️ API response body is null or empty - TPIN check failed");
+                        return "1"; // Empty response = TPIN check failed
+                    }
+
+                    // Parse JSON
+                    com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<String, Object> jsonData = objectMapper.readValue(jsonBody, Map.class);
+                    logger.info("🔍 Parsed JSON keys: {}", jsonData.keySet());
+
+                    // Check if items array exists and has data
+                    if (jsonData.containsKey("items") && jsonData.get("items") instanceof java.util.List) {
+                        java.util.List<?> items = (java.util.List<?>) jsonData.get("items");
+                        logger.info("🔍 Items array size: {}", items.size());
+
+                        if (!items.isEmpty() && items.get(0) instanceof Map) {
+                            Map<String, Object> item = (Map<String, Object>) items.get(0);
+                            logger.info("🔍 Token item keys: {}", item.keySet());
+
+                            // Extract TPIN from API response
+                            if (item.containsKey("ivrs_pin")) {
+                                Object apiTpinObj = item.get("ivrs_pin");
+                                if (apiTpinObj != null) {
+                                    String apiTpin = String.valueOf(apiTpinObj).trim();
+                                    logger.info("🔐 TPIN comparison: input='{}', api='{}'", inputTpin, apiTpin);
+
+                                    // Compare TPINs (exact match required)
+                                    if (inputTpin.equals(apiTpin)) {
+                                        logger.info("✅ TPIN MATCH SUCCESS for serviceNumber: {}, category: {}", serviceNumber, category);
+                                        return "0"; // Match
+                                    } else {
+                                        logger.warn("❌ TPIN MISMATCH: input='{}' != api='{}' for serviceNumber: {}, category: {}",
+                                                inputTpin, apiTpin, serviceNumber, category);
+                                        return "1"; // Mismatch
+                                    }
+                                } else {
+                                    logger.warn("⚠️ API returned null ivrs_pin for serviceNumber: {}, category: {}", serviceNumber, category);
+                                    return "1"; // Null TPIN = failed
+                                }
+                            } else {
+                                logger.warn("⚠️ No 'ivrs_pin' key found in API response. Available keys: {}", item.keySet());
+                                return "1"; // Missing TPIN field = failed
+                            }
+                        } else {
+                            logger.warn("⚠️ Items array is empty or first item is not a Map. Items size: {}", items.size());
+                            return "1"; // No valid data = failed
+                        }
+                    } else {
+                        logger.warn("⚠️ No 'items' key found or it's not a List. Available keys: {}", jsonData.keySet());
+                        return "1"; // Invalid structure = failed
+                    }
+                } else {
+                    logger.warn("⚠️ No 'body' key found in call_1 result");
+                    return "1"; // No body = failed
+                }
+            } else {
+                logger.warn("⚠️ No 'call_1' key found in result. Available keys: {}", result.keySet());
+                return "1"; // No call result = failed
+            }
+
+        } catch (Exception e) {
+            logger.error("❌ Error checking TPIN match: {}", e.getMessage(), e);
+            return "1"; // Any error = failed
+        }
     }
 
     // ============= SERVICE CHECK PROCESSING LOGIC =============
@@ -277,7 +462,6 @@ public class TrulyDynamicSoapEndpoint {
 
     // ============= PAYSLIP PROCESSING LOGIC =============
 
-    // New method for OPW/APW/CPW (category determined by endpoint type)
     private Element handlePayslipRequestWithCategory(Element request, String namespace, String operationName, String jsonKey, String category) {
         try {
             logger.info("🔍 Processing payslip request with auto-category: operation={}, jsonKey={}, category={}", operationName, jsonKey, category);

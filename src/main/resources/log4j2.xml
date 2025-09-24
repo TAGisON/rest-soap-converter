@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+    <Appenders>
+        <!-- Console Appender -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+        </Console>
+        <!-- Rolling File Appender -->
+        <RollingFile name="RollingFile"
+                     fileName="/var/log/coralswitch/softswitch/soap-converter/rest-soap-converter.log"
+                     filePattern="/var/log/coralswitch/softswitch/soap-converter/rest-soap-converter.%i.log.gz">
+            <PatternLayout>
+                <pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5"/>
+        </RollingFile>
+        <!-- Syslog Appender (production/optional) -->
+        <Syslog name="Syslog" host="127.0.0.1" port="514" protocol="UDP"
+                format="RFC5424" appName="rest-soap-converter" facility="LOCAL0"/>
+    </Appenders>
+    <Loggers>
+        <!-- Spring specific logging -->
+        <Logger name="org.springframework" level="warn"/>
+        <Logger name="org.springframework.transaction" level="warn"/>
+        <Logger name="org.springframework.web.servlet.mvc" level="warn"/>
+        <!-- Application logs -->
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+            <AppenderRef ref="Syslog"/>
+        </Root>
+    </Loggers>
+</Configuration>
