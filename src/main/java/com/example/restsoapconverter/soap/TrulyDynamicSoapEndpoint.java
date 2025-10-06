@@ -496,6 +496,10 @@ public class TrulyDynamicSoapEndpoint {
             String value = extractPayslipValue(result, jsonKey);
             logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
 
+            //Adding numberinwords- before value to play it in words
+            value = "numberinwords-" + value;
+            logger.info("Added numberinwords- Before value to play it in words");
+
             return createSimpleResponse(namespace, operationName, value);
 
         } catch (Exception e) {

@@ -1,0 +1,198 @@
+
+=============================================================
+🎯 TPIN CHECK ENDPOINTS SETUP & TESTING
+=============================================================
+
+NEW ENDPOINTS ADDED:
+✅ CheckTPINOPW → Validates TPIN for OPW (category=0)
+✅ CheckTPINAPW → Validates TPIN for APW (category=1)  
+✅ CheckTPINCPW → Validates TPIN for CPW (category=2)
+
+REQUEST FORMAT:
+- serviceNumber: The service number to check
+- tpin: 4-digit PIN to validate (e.g., "1234")
+
+RESPONSE VALUES:
+- 0 = TPIN matches correctly
+- 1 = TPIN doesn't match or any error
+
+=============================================================
+STEP 1: REGISTER TPIN CHECK ENDPOINTS
+=============================================================
+
+🚀 1. REGISTER OPW TPIN CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckTPINOPWEndpoint",
+    "operationName": "CheckTPINOPW",
+    "namespace": "http://afcao.tpin.opw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/tokenDetails/${category}/${serviceNumber}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 2. REGISTER APW TPIN CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckTPINAPWEndpoint",
+    "operationName": "CheckTPINAPW",
+    "namespace": "http://afcao.tpin.apw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/tokenDetails/${category}/${serviceNumber}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 3. REGISTER CPW TPIN CHECK ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "CheckTPINCPWEndpoint",
+    "operationName": "CheckTPINCPW",
+    "namespace": "http://afcao.tpin.cpw.check.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/tokenDetails/${category}/${serviceNumber}",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+=============================================================
+STEP 2: TEST TPIN CHECK ENDPOINTS
+=============================================================
+
+🧪 1. TEST OPW TPIN CHECK (Correct TPIN):
+curl --location 'http://localhost:8080/ws/CheckTPINOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.tpin.opw.check.service/CheckTPINOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.tpin.opw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:CheckTPINOPWRequest>
+      <opw:serviceNumber>977735</opw:serviceNumber>
+      <opw:tpin>1234</opw:tpin>
+    </opw:CheckTPINOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (if TPIN matches):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <CheckTPINOPWResponse xmlns="http://afcao.tpin.opw.check.service">
+           <return>0</return>
+        </CheckTPINOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 2. TEST OPW TPIN CHECK (Wrong TPIN):
+curl --location 'http://localhost:8080/ws/CheckTPINOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.tpin.opw.check.service/CheckTPINOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.tpin.opw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:CheckTPINOPWRequest>
+      <opw:serviceNumber>977735</opw:serviceNumber>
+      <opw:tpin>9999</opw:tpin>
+    </opw:CheckTPINOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (if TPIN doesn't match):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <CheckTPINOPWResponse xmlns="http://afcao.tpin.opw.check.service">
+           <return>1</return>
+        </CheckTPINOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 3. TEST APW TPIN CHECK:
+curl --location 'http://localhost:8080/ws/CheckTPINAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.tpin.apw.check.service/CheckTPINAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.tpin.apw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:CheckTPINAPWRequest>
+      <apw:serviceNumber>977735</apw:serviceNumber>
+      <apw:tpin>1234</apw:tpin>
+    </apw:CheckTPINAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+🧪 4. TEST CPW TPIN CHECK:
+curl --location 'http://localhost:8080/ws/CheckTPINCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.tpin.cpw.check.service/CheckTPINCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.tpin.cpw.check.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:CheckTPINCPWRequest>
+      <cpw:serviceNumber>977735</cpw:serviceNumber>
+      <cpw:tpin>1234</cpw:tpin>
+    </cpw:CheckTPINCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+=============================================================
+TESTING SCENARIOS
+=============================================================
+
+✅ CORRECT TPIN:
+- Request: serviceNumber=977735, tpin=1234
+- API Response: {"items":[{"ivrs_pin":"1234"}]}
+- SOAP Response: <return>0</return>
+
+❌ WRONG TPIN:
+- Request: serviceNumber=977735, tpin=9999  
+- API Response: {"items":[{"ivrs_pin":"1234"}]}
+- SOAP Response: <return>1</return>
+
+❌ INVALID SERVICE NUMBER:
+- Request: serviceNumber=99999, tpin=1234
+- API Response: {"items":[],"count":0} OR HTTP error
+- SOAP Response: <return>1</return>
+
+❌ MISSING PARAMETERS:
+- Request: Missing serviceNumber or tpin
+- SOAP Response: <return>1</return>
+
+❌ INVALID TPIN FORMAT:
+- Request: tpin="abc" or tpin="12345"
+- SOAP Response: <return>1</return>
+
+=============================================================
+ENDPOINT SUMMARY (18 TOTAL)
+=============================================================
+
+👥 Personnel: 2 endpoints
+💰 Payslip Data: 9 endpoints (3 per type × 3 types)
+✅ Service Check: 3 endpoints (1 per type)
+🔐 TPIN Check: 3 endpoints (1 per type) - NEW!
+📊 Rank History: 1 endpoint
+
+TOTAL: 18 SOAP endpoints with dynamic registration! 🎉
