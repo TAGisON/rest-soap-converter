@@ -84,7 +84,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetNetPayOPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetNetPayOPW request");
-        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.opw.netpay.service", "GetNetPayOPW", "net_entitlement", "0");
+        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.opw.netpay.service", "GetNetPayOPW", "net_pay", "0");
     }
 
     // ============= APW PAYSLIP ENDPOINTS =============
@@ -110,7 +110,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetNetPayAPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetNetPayAPW request");
-        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.apw.netpay.service", "GetNetPayAPW", "net_entitlement", "1");
+        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.apw.netpay.service", "GetNetPayAPW", "net_pay", "1");
     }
 
     // ============= CPW PAYSLIP ENDPOINTS =============
@@ -136,7 +136,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetNetPayCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetNetPayCPW request");
-        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.cpw.netpay.service", "GetNetPayCPW", "net_entitlement", "2");
+        return handlePayslipRequestWithCategory(request, "http://afcao.payslip.cpw.netpay.service", "GetNetPayCPW", "net_pay", "2");
     }
 
     // ============= SERVICE NUMBER CHECK ENDPOINTS =============
@@ -165,7 +165,7 @@ public class TrulyDynamicSoapEndpoint {
         return handleServiceCheckRequestWithCategory(request, "http://afcao.payslip.cpw.check.service", "CheckServiceNoCPW", "2");
     }
 
-    // ============= NEW TPIN CHECK ENDPOINTS =============
+    // ============= TPIN CHECK ENDPOINTS =============
 
     @SoapAction("http://afcao.tpin.opw.check.service/CheckTPINOPW")
     @PayloadRoot(namespace = "http://afcao.tpin.opw.check.service", localPart = "CheckTPINOPWRequest")
@@ -189,6 +189,107 @@ public class TrulyDynamicSoapEndpoint {
     public Element handleCheckTPINCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling CheckTPINCPW request");
         return handleTPINCheckRequestWithCategory(request, "http://afcao.tpin.cpw.check.service", "CheckTPINCPW", "2");
+    }
+
+    // ============= NEW PF (PROVIDENT FUND) ENDPOINTS =============
+
+    // OPW PF ENDPOINTS
+    @SoapAction("http://afcao.pf.opw.balancenontaxable.service/GetPFBalanceNonTaxableOPW")
+    @PayloadRoot(namespace = "http://afcao.pf.opw.balancenontaxable.service", localPart = "GetPFBalanceNonTaxableOPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceNonTaxableOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceNonTaxableOPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.opw.balancenontaxable.service", "GetPFBalanceNonTaxableOPW", "cl_bal_pf_non_taxable", "0");
+    }
+
+    @SoapAction("http://afcao.pf.opw.balancetaxable.service/GetPFBalanceTaxableOPW")
+    @PayloadRoot(namespace = "http://afcao.pf.opw.balancetaxable.service", localPart = "GetPFBalanceTaxableOPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceTaxableOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceTaxableOPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.opw.balancetaxable.service", "GetPFBalanceTaxableOPW", "cl_bal_pf_taxable", "0");
+    }
+
+    @SoapAction("http://afcao.pf.opw.subscription.service/GetPFSubscriptionOPW")
+    @PayloadRoot(namespace = "http://afcao.pf.opw.subscription.service", localPart = "GetPFSubscriptionOPWRequest")
+    @ResponsePayload
+    public Element handleGetPFSubscriptionOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFSubscriptionOPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.opw.subscription.service", "GetPFSubscriptionOPW", "pf_sub", "0");
+    }
+
+    @SoapAction("http://afcao.pf.opw.regime.service/GetPFRegimeOPW")
+    @PayloadRoot(namespace = "http://afcao.pf.opw.regime.service", localPart = "GetPFRegimeOPWRequest")
+    @ResponsePayload
+    public Element handleGetPFRegimeOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFRegimeOPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.opw.regime.service", "GetPFRegimeOPW", "regime", "0");
+    }
+
+    // APW PF ENDPOINTS
+    @SoapAction("http://afcao.pf.apw.balancenontaxable.service/GetPFBalanceNonTaxableAPW")
+    @PayloadRoot(namespace = "http://afcao.pf.apw.balancenontaxable.service", localPart = "GetPFBalanceNonTaxableAPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceNonTaxableAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceNonTaxableAPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.apw.balancenontaxable.service", "GetPFBalanceNonTaxableAPW", "cl_bal_pf_non_taxable", "1");
+    }
+
+    @SoapAction("http://afcao.pf.apw.balancetaxable.service/GetPFBalanceTaxableAPW")
+    @PayloadRoot(namespace = "http://afcao.pf.apw.balancetaxable.service", localPart = "GetPFBalanceTaxableAPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceTaxableAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceTaxableAPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.apw.balancetaxable.service", "GetPFBalanceTaxableAPW", "cl_bal_pf_taxable", "1");
+    }
+
+    @SoapAction("http://afcao.pf.apw.subscription.service/GetPFSubscriptionAPW")
+    @PayloadRoot(namespace = "http://afcao.pf.apw.subscription.service", localPart = "GetPFSubscriptionAPWRequest")
+    @ResponsePayload
+    public Element handleGetPFSubscriptionAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFSubscriptionAPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.apw.subscription.service", "GetPFSubscriptionAPW", "pf_sub", "1");
+    }
+
+    @SoapAction("http://afcao.pf.apw.regime.service/GetPFRegimeAPW")
+    @PayloadRoot(namespace = "http://afcao.pf.apw.regime.service", localPart = "GetPFRegimeAPWRequest")
+    @ResponsePayload
+    public Element handleGetPFRegimeAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFRegimeAPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.apw.regime.service", "GetPFRegimeAPW", "regime", "1");
+    }
+
+    // CPW PF ENDPOINTS
+    @SoapAction("http://afcao.pf.cpw.balancenontaxable.service/GetPFBalanceNonTaxableCPW")
+    @PayloadRoot(namespace = "http://afcao.pf.cpw.balancenontaxable.service", localPart = "GetPFBalanceNonTaxableCPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceNonTaxableCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceNonTaxableCPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancenontaxable.service", "GetPFBalanceNonTaxableCPW", "cl_bal_pf_non_taxable", "2");
+    }
+
+    @SoapAction("http://afcao.pf.cpw.balancetaxable.service/GetPFBalanceTaxableCPW")
+    @PayloadRoot(namespace = "http://afcao.pf.cpw.balancetaxable.service", localPart = "GetPFBalanceTaxableCPWRequest")
+    @ResponsePayload
+    public Element handleGetPFBalanceTaxableCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFBalanceTaxableCPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancetaxable.service", "GetPFBalanceTaxableCPW", "cl_bal_pf_taxable", "2");
+    }
+
+    @SoapAction("http://afcao.pf.cpw.subscription.service/GetPFSubscriptionCPW")
+    @PayloadRoot(namespace = "http://afcao.pf.cpw.subscription.service", localPart = "GetPFSubscriptionCPWRequest")
+    @ResponsePayload
+    public Element handleGetPFSubscriptionCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFSubscriptionCPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.subscription.service", "GetPFSubscriptionCPW", "pf_sub", "2");
+    }
+
+    @SoapAction("http://afcao.pf.cpw.regime.service/GetPFRegimeCPW")
+    @PayloadRoot(namespace = "http://afcao.pf.cpw.regime.service", localPart = "GetPFRegimeCPWRequest")
+    @ResponsePayload
+    public Element handleGetPFRegimeCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPFRegimeCPW request");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.regime.service", "GetPFRegimeCPW", "regime", "2");
     }
 
     // ============= TPIN CHECK PROCESSING LOGIC =============
@@ -497,8 +598,8 @@ public class TrulyDynamicSoapEndpoint {
             logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
 
             //Adding numberinwords- before value to play it in words
-            value = "numberinwords-" + value;
-            logger.info("Added numberinwords- Before value to play it in words");
+//            value = "numberinwords-" + value;
+//            logger.info("Added numberinwords- Before value to play it in words");
 
             return createSimpleResponse(namespace, operationName, value);
 
