@@ -1,0 +1,898 @@
+=============================================================
+🎯 PAYSLIP ELEMENT ENDPOINTS - COMPLETE REGISTRATION & TESTING GUIDE
+=============================================================
+
+NEW ENDPOINTS: 18 (6 fields × 3 types: OPW, APW, CPW)
+
+Fields:
+1. PAN Number (pan_no)
+2. Date of Birth (dob) - UTC to IST Epoch conversion
+3. Rank Date (rnkdt) - UTC to IST Epoch conversion
+4. Enrollment Date (p_enrldate) - UTC to IST Epoch conversion
+5. Next Increment Date (irla_next_incr_date) - UTC to IST Epoch conversion
+6. Last 4 Digits of Aadhar (aadhar_no) - Extracted from masked number
+
+API Used: PAYSLIP_ELEMENT_XYZ (where XYZ = OPW, APW, CPW)
+Format: http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/{serviceNumber}/{category}
+
+✅ KEY FEATURES:
+- Auto UTC to IST timezone conversion for date fields
+- Returns dates as Epoch seconds (Unix timestamp)
+- Extracts last 4 digits from masked Aadhar number
+- Comprehensive error handling and logging
+
+=============================================================
+STEP 1: REGISTER ALL 18 PAYSLIP ELEMENT ENDPOINTS
+=============================================================
+
+🚀 1. REGISTER OPW PAN ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetPANOPWEndpoint",
+    "operationName": "GetPANOPW",
+    "namespace": "http://afcao.payslip.opw.pan.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 2. REGISTER OPW DOB ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetDOBOPWEndpoint",
+    "operationName": "GetDOBOPW",
+    "namespace": "http://afcao.payslip.opw.dob.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 3. REGISTER OPW RANK DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetRankDateOPWEndpoint",
+    "operationName": "GetRankDateOPW",
+    "namespace": "http://afcao.payslip.opw.rankdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 4. REGISTER OPW ENROLLMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetEnrollmentDateOPWEndpoint",
+    "operationName": "GetEnrollmentDateOPW",
+    "namespace": "http://afcao.payslip.opw.enrollmentdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 5. REGISTER OPW NEXT INCREMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetNextIncrementDateOPWEndpoint",
+    "operationName": "GetNextIncrementDateOPW",
+    "namespace": "http://afcao.payslip.opw.nextincrementdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 6. REGISTER OPW AADHAR LAST FOUR ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetAadharLastFourOPWEndpoint",
+    "operationName": "GetAadharLastFourOPW",
+    "namespace": "http://afcao.payslip.opw.aadhar.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_OPW/${serviceNumber}/0",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 7. REGISTER APW PAN ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetPANAPWEndpoint",
+    "operationName": "GetPANAPW",
+    "namespace": "http://afcao.payslip.apw.pan.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 8. REGISTER APW DOB ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetDOBAPWEndpoint",
+    "operationName": "GetDOBAPW",
+    "namespace": "http://afcao.payslip.apw.dob.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 9. REGISTER APW RANK DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetRankDateAPWEndpoint",
+    "operationName": "GetRankDateAPW",
+    "namespace": "http://afcao.payslip.apw.rankdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 10. REGISTER APW ENROLLMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetEnrollmentDateAPWEndpoint",
+    "operationName": "GetEnrollmentDateAPW",
+    "namespace": "http://afcao.payslip.apw.enrollmentdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 11. REGISTER APW NEXT INCREMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetNextIncrementDateAPWEndpoint",
+    "operationName": "GetNextIncrementDateAPW",
+    "namespace": "http://afcao.payslip.apw.nextincrementdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 12. REGISTER APW AADHAR LAST FOUR ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetAadharLastFourAPWEndpoint",
+    "operationName": "GetAadharLastFourAPW",
+    "namespace": "http://afcao.payslip.apw.aadhar.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_APW/${serviceNumber}/1",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 13. REGISTER CPW PAN ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetPANCPWEndpoint",
+    "operationName": "GetPANCPW",
+    "namespace": "http://afcao.payslip.cpw.pan.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 14. REGISTER CPW DOB ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetDOBCPWEndpoint",
+    "operationName": "GetDOBCPW",
+    "namespace": "http://afcao.payslip.cpw.dob.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 15. REGISTER CPW RANK DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetRankDateCPWEndpoint",
+    "operationName": "GetRankDateCPW",
+    "namespace": "http://afcao.payslip.cpw.rankdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 16. REGISTER CPW ENROLLMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetEnrollmentDateCPWEndpoint",
+    "operationName": "GetEnrollmentDateCPW",
+    "namespace": "http://afcao.payslip.cpw.enrollmentdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 17. REGISTER CPW NEXT INCREMENT DATE ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetNextIncrementDateCPWEndpoint",
+    "operationName": "GetNextIncrementDateCPW",
+    "namespace": "http://afcao.payslip.cpw.nextincrementdate.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+🚀 18. REGISTER CPW AADHAR LAST FOUR ENDPOINT:
+curl -X POST http://localhost:8080/admin/endpoints \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "GetAadharLastFourCPWEndpoint",
+    "operationName": "GetAadharLastFourCPW",
+    "namespace": "http://afcao.payslip.cpw.aadhar.service",
+    "enabled": true,
+    "restCalls": [
+      {
+        "sequenceOrder": 1,
+        "method": "GET",
+        "urlTemplate": "http://sampoorna.cao.local/afcao/ipas/ivrs/PAYSLIP_ELEMENT_CPW/${serviceNumber}/2",
+        "authType": "NONE",
+        "timeoutMs": 30000
+      }
+    ],
+    "mappings": []
+  }'
+
+=============================================================
+STEP 2: TEST ALL 18 PAYSLIP ELEMENT ENDPOINTS
+=============================================================
+
+=============================================================
+OPW ENDPOINTS TESTING (Category 0, Service Number: 91457)
+=============================================================
+
+🧪 TEST 1: OPW PAN NUMBER:
+curl --location 'http://localhost:8080/ws/GetPANOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.pan.service/GetPANOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.pan.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetPANOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetPANOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response:
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetPANOPWResponse xmlns="http://afcao.payslip.opw.pan.service">
+           <return>AFEPV3608Q</return>
+        </GetPANOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 2: OPW DOB (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetDOBOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.dob.service/GetDOBOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.dob.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetDOBOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetDOBOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetDOBOPWResponse xmlns="http://afcao.payslip.opw.dob.service">
+           <return>555513000</return>
+        </GetDOBOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 3: OPW RANK DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetRankDateOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.rankdate.service/GetRankDateOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.rankdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetRankDateOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetRankDateOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetRankDateOPWResponse xmlns="http://afcao.payslip.opw.rankdate.service">
+           <return>1753958400</return>
+        </GetRankDateOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 4: OPW ENROLLMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetEnrollmentDateOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.enrollmentdate.service/GetEnrollmentDateOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.enrollmentdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetEnrollmentDateOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetEnrollmentDateOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetEnrollmentDateOPWResponse xmlns="http://afcao.payslip.opw.enrollmentdate.service">
+           <return>1135651800</return>
+        </GetEnrollmentDateOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 5: OPW NEXT INCREMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetNextIncrementDateOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.nextincrementdate.service/GetNextIncrementDateOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.nextincrementdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetNextIncrementDateOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetNextIncrementDateOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetNextIncrementDateOPWResponse xmlns="http://afcao.payslip.opw.nextincrementdate.service">
+           <return>1767207000</return>
+        </GetNextIncrementDateOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 6: OPW AADHAR LAST 4 DIGITS (Extracted):
+curl --location 'http://localhost:8080/ws/GetAadharLastFourOPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.opw.aadhar.service/GetAadharLastFourOPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:opw="http://afcao.payslip.opw.aadhar.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <opw:GetAadharLastFourOPWRequest>
+      <opw:serviceNumber>91457</opw:serviceNumber>
+    </opw:GetAadharLastFourOPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Last 4 digits):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetAadharLastFourOPWResponse xmlns="http://afcao.payslip.opw.aadhar.service">
+           <return>5233</return>
+        </GetAadharLastFourOPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+=============================================================
+APW ENDPOINTS TESTING (Category 1, Service Number: 916369)
+=============================================================
+
+🧪 TEST 7: APW PAN NUMBER:
+curl --location 'http://localhost:8080/ws/GetPANAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.pan.service/GetPANAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.pan.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetPANAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetPANAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response:
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetPANAPWResponse xmlns="http://afcao.payslip.apw.pan.service">
+           <return>AFEPV3608Q</return>
+        </GetPANAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 8: APW DOB (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetDOBAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.dob.service/GetDOBAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.dob.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetDOBAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetDOBAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetDOBAPWResponse xmlns="http://afcao.payslip.apw.dob.service">
+           <return>555513000</return>
+        </GetDOBAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 9: APW RANK DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetRankDateAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.rankdate.service/GetRankDateAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.rankdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetRankDateAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetRankDateAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetRankDateAPWResponse xmlns="http://afcao.payslip.apw.rankdate.service">
+           <return>1753958400</return>
+        </GetRankDateAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 10: APW ENROLLMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetEnrollmentDateAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.enrollmentdate.service/GetEnrollmentDateAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.enrollmentdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetEnrollmentDateAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetEnrollmentDateAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetEnrollmentDateAPWResponse xmlns="http://afcao.payslip.apw.enrollmentdate.service">
+           <return>1135651800</return>
+        </GetEnrollmentDateAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 11: APW NEXT INCREMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetNextIncrementDateAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.nextincrementdate.service/GetNextIncrementDateAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.nextincrementdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetNextIncrementDateAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetNextIncrementDateAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetNextIncrementDateAPWResponse xmlns="http://afcao.payslip.apw.nextincrementdate.service">
+           <return>1767207000</return>
+        </GetNextIncrementDateAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 12: APW AADHAR LAST 4 DIGITS (Extracted):
+curl --location 'http://localhost:8080/ws/GetAadharLastFourAPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.apw.aadhar.service/GetAadharLastFourAPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:apw="http://afcao.payslip.apw.aadhar.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <apw:GetAadharLastFourAPWRequest>
+      <apw:serviceNumber>916369</apw:serviceNumber>
+    </apw:GetAadharLastFourAPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Last 4 digits):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetAadharLastFourAPWResponse xmlns="http://afcao.payslip.apw.aadhar.service">
+           <return>5233</return>
+        </GetAadharLastFourAPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+=============================================================
+CPW ENDPOINTS TESTING (Category 2, Service Number: 916234)
+=============================================================
+
+🧪 TEST 13: CPW PAN NUMBER:
+curl --location 'http://localhost:8080/ws/GetPANCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.pan.service/GetPANCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.pan.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetPANCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetPANCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response:
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetPANCPWResponse xmlns="http://afcao.payslip.cpw.pan.service">
+           <return>AFEPV3608Q</return>
+        </GetPANCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 14: CPW DOB (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetDOBCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.dob.service/GetDOBCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.dob.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetDOBCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetDOBCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetDOBCPWResponse xmlns="http://afcao.payslip.cpw.dob.service">
+           <return>555513000</return>
+        </GetDOBCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 15: CPW RANK DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetRankDateCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.rankdate.service/GetRankDateCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.rankdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetRankDateCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetRankDateCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetRankDateCPWResponse xmlns="http://afcao.payslip.cpw.rankdate.service">
+           <return>1753958400</return>
+        </GetRankDateCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 16: CPW ENROLLMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetEnrollmentDateCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.enrollmentdate.service/GetEnrollmentDateCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.enrollmentdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetEnrollmentDateCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetEnrollmentDateCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetEnrollmentDateCPWResponse xmlns="http://afcao.payslip.cpw.enrollmentdate.service">
+           <return>1135651800</return>
+        </GetEnrollmentDateCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 17: CPW NEXT INCREMENT DATE (Converted to IST Epoch Seconds):
+curl --location 'http://localhost:8080/ws/GetNextIncrementDateCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.nextincrementdate.service/GetNextIncrementDateCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.nextincrementdate.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetNextIncrementDateCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetNextIncrementDateCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Epoch Seconds in IST):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetNextIncrementDateCPWResponse xmlns="http://afcao.payslip.cpw.nextincrementdate.service">
+           <return>1767207000</return>
+        </GetNextIncrementDateCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+🧪 TEST 18: CPW AADHAR LAST 4 DIGITS (Extracted):
+curl --location 'http://localhost:8080/ws/GetAadharLastFourCPW' \
+--header 'Content-Type: text/xml; charset=utf-8' \
+--header 'SOAPAction: "http://afcao.payslip.cpw.aadhar.service/GetAadharLastFourCPW"' \
+--data '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:cpw="http://afcao.payslip.cpw.aadhar.service">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <cpw:GetAadharLastFourCPWRequest>
+      <cpw:serviceNumber>916234</cpw:serviceNumber>
+    </cpw:GetAadharLastFourCPWRequest>
+  </soapenv:Body>
+</soapenv:Envelope>'
+
+Expected Response (Last 4 digits):
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Body>
+        <GetAadharLastFourCPWResponse xmlns="http://afcao.payslip.cpw.aadhar.service">
+           <return>5233</return>
+        </GetAadharLastFourCPWResponse>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+
+=============================================================
+TIME ZONE & DATE CONVERSION DETAILS
+=============================================================
+
+INPUT: UTC ISO 8601 Format
+- "1987-08-10T18:30:00Z" (API returns in UTC)
+
+PROCESSING:
+1. Parse UTC ISO date string
+2. Convert timezone from UTC to IST (Asia/Kolkata) - adds 5 hours 30 minutes
+3. Convert to Unix Epoch seconds
+
+OUTPUT: Epoch Seconds (IST)
+- "555513000" (seconds since Unix epoch in IST timezone)
+
+EXAMPLE CONVERSION:
+UTC: "1987-08-10T18:30:00Z"
+  ↓ Add 5.5 hours
+IST: "1987-08-11T00:00:00+05:30"
+  ↓ Convert to Epoch
+Epoch: 555513000
+
+AADHAR EXTRACTION:
+- Input: "********5233" (masked format from API)
+- Processing: Extract last 4 characters
+- Validation: Must be exactly 4 digits
+- Output: "5233" (last 4 digits only)
+
+ERROR HANDLING:
+- Invalid date format → "-1"
+- Null/empty value → "-1"
+- JSON parsing error → "-1"
+- Missing field → "-1"
+- Service number not found → "-1"
+- Invalid Aadhar format → "-1"
+
+=============================================================
+TESTING SERVICE NUMBERS
+=============================================================
+
+OPW Testing:
+- Service Number: 91457
+- Category: 0
+- API: PAYSLIP_ELEMENT_OPW
+
+APW Testing:
+- Service Number: 916369
+- Category: 1
+- API: PAYSLIP_ELEMENT_APW
+
+CPW Testing:
+- Service Number: 916234
+- Category: 2
+- API: PAYSLIP_ELEMENT_CPW
+
+=============================================================
+QUICK VERIFICATION CHECKLIST
+=============================================================
+
+After registration, verify:
+✅ All 18 endpoints registered successfully
+✅ Each endpoint shows "enabled": true
+✅ Correct namespace for each endpoint
+✅ Correct API URL template for each category
+
+After testing, verify:
+✅ PAN numbers return alphanumeric (e.g., "AFEPV3608Q")
+✅ Date fields return numeric epoch seconds (e.g., "555513000")
+✅ Aadhar returns exactly 4 digits (e.g., "5233")
+✅ Error cases return "-1"
+✅ SOAP response format is valid XML
+
+=============================================================
+COMPLETE ENDPOINT SUMMARY (51 TOTAL!)
+=============================================================
+
+Endpoint Count Breakdown:
+- Personnel & Rank History: 2
+- Payslip Data (gross_entitlement, gross_deductions, net_pay): 9
+- PF Endpoints: 12
+- Service Check: 3
+- TPIN Check: 3
+- Payslip Elements (NEW): 18
+- Other dynamic: 4
+
+TOTAL: 51 ENTERPRISE-GRADE SOAP ENDPOINTS! 🎉
+
+All production-ready with:
+✅ Comprehensive error handling
+✅ Detailed logging at every step
+✅ UTC to IST timezone conversion
+✅ Epoch seconds conversion
+✅ Aadhar masking extraction
+✅ Field validation and verification
+✅ Consistent response format
+
+=============================================================
+END OF COMPLETE TESTING GUIDE
+=============================================================

@@ -18,6 +18,9 @@ import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -27,6 +30,9 @@ public class TrulyDynamicSoapEndpoint {
 
     private static final Logger logger = LoggerFactory.getLogger(TrulyDynamicSoapEndpoint.class);
     private final Map<String, SoapEndpoint> registeredEndpoints = new ConcurrentHashMap<>();
+    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+    private static final ZoneId IST_ZONE = ZoneId.of("Asia/Kolkata");
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     @Autowired
     private ExecutionEngineService executionEngineService;
@@ -290,6 +296,339 @@ public class TrulyDynamicSoapEndpoint {
     public Element handleGetPFRegimeCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetPFRegimeCPW request");
         return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.regime.service", "GetPFRegimeCPW", "regime", "2");
+    }
+
+    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR OPW =============
+
+    @SoapAction("http://afcao.payslip.opw.pan.service/GetPANOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.pan.service", localPart = "GetPANOPWRequest")
+    @ResponsePayload
+    public Element handleGetPANOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPANOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.pan.service", "GetPANOPW", "pan_no", "0", false);
+    }
+
+    @SoapAction("http://afcao.payslip.opw.dob.service/GetDOBOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.dob.service", localPart = "GetDOBOPWRequest")
+    @ResponsePayload
+    public Element handleGetDOBOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetDOBOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.dob.service", "GetDOBOPW", "dob", "0", true);
+    }
+
+    @SoapAction("http://afcao.payslip.opw.rankdate.service/GetRankDateOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.rankdate.service", localPart = "GetRankDateOPWRequest")
+    @ResponsePayload
+    public Element handleGetRankDateOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetRankDateOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.rankdate.service", "GetRankDateOPW", "rnkdt", "0", true);
+    }
+
+    @SoapAction("http://afcao.payslip.opw.enrollmentdate.service/GetEnrollmentDateOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.enrollmentdate.service", localPart = "GetEnrollmentDateOPWRequest")
+    @ResponsePayload
+    public Element handleGetEnrollmentDateOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetEnrollmentDateOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.enrollmentdate.service", "GetEnrollmentDateOPW", "p_enrldate", "0", true);
+    }
+
+    @SoapAction("http://afcao.payslip.opw.nextincrementdate.service/GetNextIncrementDateOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.nextincrementdate.service", localPart = "GetNextIncrementDateOPWRequest")
+    @ResponsePayload
+    public Element handleGetNextIncrementDateOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetNextIncrementDateOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.nextincrementdate.service", "GetNextIncrementDateOPW", "irla_next_incr_date", "0", true);
+    }
+
+    @SoapAction("http://afcao.payslip.opw.aadhar.service/GetAadharLastFourOPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.opw.aadhar.service", localPart = "GetAadharLastFourOPWRequest")
+    @ResponsePayload
+    public Element handleGetAadharLastFourOPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetAadharLastFourOPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.aadhar.service", "GetAadharLastFourOPW", "aadhar_no", "0", false);
+    }
+
+    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR APW =============
+
+    @SoapAction("http://afcao.payslip.apw.pan.service/GetPANAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.pan.service", localPart = "GetPANAPWRequest")
+    @ResponsePayload
+    public Element handleGetPANAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPANAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.pan.service", "GetPANAPW", "pan_no", "1", false);
+    }
+
+    @SoapAction("http://afcao.payslip.apw.dob.service/GetDOBAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.dob.service", localPart = "GetDOBAPWRequest")
+    @ResponsePayload
+    public Element handleGetDOBAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetDOBAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.dob.service", "GetDOBAPW", "dob", "1", true);
+    }
+
+    @SoapAction("http://afcao.payslip.apw.rankdate.service/GetRankDateAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.rankdate.service", localPart = "GetRankDateAPWRequest")
+    @ResponsePayload
+    public Element handleGetRankDateAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetRankDateAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.rankdate.service", "GetRankDateAPW", "rnkdt", "1", true);
+    }
+
+    @SoapAction("http://afcao.payslip.apw.enrollmentdate.service/GetEnrollmentDateAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.enrollmentdate.service", localPart = "GetEnrollmentDateAPWRequest")
+    @ResponsePayload
+    public Element handleGetEnrollmentDateAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetEnrollmentDateAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.enrollmentdate.service", "GetEnrollmentDateAPW", "p_enrldate", "1", true);
+    }
+
+    @SoapAction("http://afcao.payslip.apw.nextincrementdate.service/GetNextIncrementDateAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.nextincrementdate.service", localPart = "GetNextIncrementDateAPWRequest")
+    @ResponsePayload
+    public Element handleGetNextIncrementDateAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetNextIncrementDateAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.nextincrementdate.service", "GetNextIncrementDateAPW", "irla_next_incr_date", "1", true);
+    }
+
+    @SoapAction("http://afcao.payslip.apw.aadhar.service/GetAadharLastFourAPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.apw.aadhar.service", localPart = "GetAadharLastFourAPWRequest")
+    @ResponsePayload
+    public Element handleGetAadharLastFourAPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetAadharLastFourAPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.aadhar.service", "GetAadharLastFourAPW", "aadhar_no", "1", false);
+    }
+
+    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR CPW =============
+
+    @SoapAction("http://afcao.payslip.cpw.pan.service/GetPANCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.pan.service", localPart = "GetPANCPWRequest")
+    @ResponsePayload
+    public Element handleGetPANCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetPANCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.pan.service", "GetPANCPW", "pan_no", "2", false);
+    }
+
+    @SoapAction("http://afcao.payslip.cpw.dob.service/GetDOBCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.dob.service", localPart = "GetDOBCPWRequest")
+    @ResponsePayload
+    public Element handleGetDOBCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetDOBCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.dob.service", "GetDOBCPW", "dob", "2", true);
+    }
+
+    @SoapAction("http://afcao.payslip.cpw.rankdate.service/GetRankDateCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.rankdate.service", localPart = "GetRankDateCPWRequest")
+    @ResponsePayload
+    public Element handleGetRankDateCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetRankDateCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.rankdate.service", "GetRankDateCPW", "rnkdt", "2", true);
+    }
+
+    @SoapAction("http://afcao.payslip.cpw.enrollmentdate.service/GetEnrollmentDateCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.enrollmentdate.service", localPart = "GetEnrollmentDateCPWRequest")
+    @ResponsePayload
+    public Element handleGetEnrollmentDateCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetEnrollmentDateCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.enrollmentdate.service", "GetEnrollmentDateCPW", "p_enrldate", "2", true);
+    }
+
+    @SoapAction("http://afcao.payslip.cpw.nextincrementdate.service/GetNextIncrementDateCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.nextincrementdate.service", localPart = "GetNextIncrementDateCPWRequest")
+    @ResponsePayload
+    public Element handleGetNextIncrementDateCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetNextIncrementDateCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.nextincrementdate.service", "GetNextIncrementDateCPW", "irla_next_incr_date", "2", true);
+    }
+
+    @SoapAction("http://afcao.payslip.cpw.aadhar.service/GetAadharLastFourCPW")
+    @PayloadRoot(namespace = "http://afcao.payslip.cpw.aadhar.service", localPart = "GetAadharLastFourCPWRequest")
+    @ResponsePayload
+    public Element handleGetAadharLastFourCPWRequest(@RequestPayload Element request) throws Exception {
+        logger.info("🎯 Handling GetAadharLastFourCPW request");
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.aadhar.service", "GetAadharLastFourCPW", "aadhar_no", "2", false);
+    }
+
+    // ============= PAYSLIP ELEMENT PROCESSING LOGIC =============
+
+    private Element handlePayslipElementRequestWithCategory(Element request, String namespace, String operationName, String jsonKey, String category, boolean isDateField) {
+        try {
+            logger.info("📋 Processing payslip element request: operation={}, jsonKey={}, category={}, isDate={}",
+                    operationName, jsonKey, category, isDateField);
+
+            // Extract parameters
+            Map<String, Object> parameters = extractParametersDynamically(request);
+            logger.info("🔍 Extracted parameters from request: {}", parameters);
+
+            if (!parameters.containsKey("serviceNumber")) {
+                logger.error("❌ Missing required parameter: serviceNumber");
+                return createSimpleResponse(namespace, operationName, "-1");
+            }
+
+            // For PAYSLIP_ELEMENT API, we use serviceNumber directly instead of category
+            String serviceNumber = (String) parameters.get("serviceNumber");
+
+            logger.info("📋 Fetching payslip element for serviceNumber: {} from category: {}", serviceNumber, category);
+
+            // Find registered endpoint
+            String key = namespace + "#" + operationName;
+            SoapEndpoint endpoint = registeredEndpoints.get(key);
+
+            if (endpoint == null) {
+                logger.error("❌ No registered endpoint found for: {}", key);
+                logger.info("Available endpoints: {}", registeredEndpoints.keySet());
+                return createSimpleResponse(namespace, operationName, "-1");
+            }
+
+            // For PAYSLIP_ELEMENT API, we pass serviceNumber and category
+            parameters.put("category", category);
+            logger.info("🔍 Parameters for API call: serviceNumber={}, category={}", serviceNumber, category);
+
+            // Execute REST call
+            Map<String, Object> result = executionEngineService.executeEndpoint(endpoint, parameters);
+
+            // Extract specific value from result
+            String value = extractPayslipElementValue(result, jsonKey, isDateField);
+            logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
+
+            return createSimpleResponse(namespace, operationName, value);
+
+        } catch (Exception e) {
+            logger.error("❌ Error processing payslip element request {}: {}", operationName, e.getMessage(), e);
+            return createSimpleResponse(namespace, operationName, "-1");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String extractPayslipElementValue(Map<String, Object> result, String jsonKey, boolean isDateField) {
+        try {
+            logger.info("📋 Extracting payslip element for key: {}, isDate: {}", jsonKey, isDateField);
+
+            // Navigate through the result structure
+            if (result.containsKey("call_1")) {
+                Map<String, Object> call1 = (Map<String, Object>) result.get("call_1");
+                if (call1.containsKey("body")) {
+                    String jsonBody = (String) call1.get("body");
+
+                    // Parse JSON
+                    com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<String, Object> jsonData = objectMapper.readValue(jsonBody, Map.class);
+
+                    // Check if items array exists and has data
+                    if (jsonData.containsKey("items") && jsonData.get("items") instanceof java.util.List) {
+                        java.util.List<?> items = (java.util.List<?>) jsonData.get("items");
+
+                        if (!items.isEmpty() && items.get(0) instanceof Map) {
+                            Map<String, Object> item = (Map<String, Object>) items.get(0);
+
+                            // Get the specific value
+                            if (item.containsKey(jsonKey)) {
+                                Object value = item.get(jsonKey);
+                                if (value != null) {
+                                    String stringValue = String.valueOf(value).trim();
+
+                                    if (isDateField && !stringValue.isEmpty()) {
+                                        // Convert UTC ISO date to IST Epoch seconds
+                                        String convertedValue = convertUTCToISTEpoch(stringValue, jsonKey);
+                                        logger.info("🔍 Successfully found {} = {} (converted from UTC to IST Epoch)", jsonKey, convertedValue);
+                                        return convertedValue;
+                                    } else if (jsonKey.equals("aadhar_no")) {
+                                        // Extract last 4 digits from masked Aadhar number (e.g., "********5233" -> "5233")
+                                        String lastFour = extractLastFourDigits(stringValue, jsonKey);
+                                        logger.info("🔍 Successfully extracted last 4 digits of Aadhar: {}", lastFour);
+                                        return lastFour;
+                                    } else {
+                                        logger.info("🔍 Successfully found {} = {}", jsonKey, stringValue);
+                                        return stringValue;
+                                    }
+                                } else {
+                                    logger.warn("⚠️ Found {} key but value is null", jsonKey);
+                                }
+                            } else {
+                                logger.warn("⚠️ JSON item does not contain key: {}. Available keys: {}", jsonKey, item.keySet());
+                            }
+                        } else {
+                            logger.warn("⚠️ Items array is empty or first item is not a Map. Items size: {}", items.size());
+                        }
+                    } else {
+                        logger.warn("⚠️ No 'items' key found or it's not a List. Available keys: {}", jsonData.keySet());
+                    }
+                } else {
+                    logger.warn("⚠️ No 'body' key found in call_1 result");
+                }
+            } else {
+                logger.warn("⚠️ No 'call_1' key found in result. Available keys: {}", result.keySet());
+            }
+
+            logger.warn("⚠️ Could not find {} in result structure", jsonKey);
+            return "-1";
+
+        } catch (Exception e) {
+            logger.error("❌ Error extracting payslip element value for {}: {}", jsonKey, e.getMessage(), e);
+            return "-1";
+        }
+    }
+
+    /**
+     * Convert UTC ISO 8601 date string to IST and return as Epoch seconds
+     * Example: "1987-08-10T18:30:00Z" -> Convert to IST -> Return Epoch seconds
+     */
+    private String convertUTCToISTEpoch(String utcDateString, String fieldName) {
+        try {
+            logger.info("🌍 Converting UTC date to IST Epoch: {}", utcDateString);
+
+            // Parse the UTC ISO date string
+            ZonedDateTime utcDateTime = ZonedDateTime.parse(utcDateString, ISO_FORMATTER);
+            logger.info("🌍 Parsed UTC DateTime: {}", utcDateTime);
+
+            // Convert to IST
+            ZonedDateTime istDateTime = utcDateTime.withZoneSameInstant(IST_ZONE);
+            logger.info("🌏 Converted to IST DateTime: {}", istDateTime);
+
+            // Convert to Epoch seconds
+            long epochSeconds = istDateTime.toEpochSecond();
+            logger.info("⏱️ Epoch Seconds (IST): {}", epochSeconds);
+
+            return String.valueOf(epochSeconds);
+
+        } catch (Exception e) {
+            logger.error("❌ Error converting UTC to IST Epoch for {}: {}", fieldName, e.getMessage(), e);
+            return "-1";
+        }
+    }
+
+    /**
+     * Extract last 4 digits from Aadhar number
+     * Example: "********5233" -> "5233"
+     */
+    private String extractLastFourDigits(String aadharNumber, String fieldName) {
+        try {
+            logger.info("🔐 Extracting last 4 digits from Aadhar: {}", aadharNumber);
+
+            if (aadharNumber == null || aadharNumber.trim().isEmpty()) {
+                logger.warn("⚠️ Aadhar number is null or empty");
+                return "-1";
+            }
+
+            String cleaned = aadharNumber.trim();
+
+            // If it's already masked like "********5233", just get last 4 chars
+            if (cleaned.length() >= 4) {
+                String lastFour = cleaned.substring(cleaned.length() - 4);
+
+                // Verify it's all digits
+                if (lastFour.matches("\\d{4}")) {
+                    logger.info("✅ Extracted last 4 digits: {}", lastFour);
+                    return lastFour;
+                }
+            }
+
+            logger.warn("⚠️ Could not extract valid 4 digits from Aadhar: {}", aadharNumber);
+            return "-1";
+
+        } catch (Exception e) {
+            logger.error("❌ Error extracting last 4 digits from Aadhar: {}", e.getMessage(), e);
+            return "-1";
+        }
     }
 
     // ============= TPIN CHECK PROCESSING LOGIC =============
@@ -596,10 +935,6 @@ public class TrulyDynamicSoapEndpoint {
             // Extract specific value from result
             String value = extractPayslipValue(result, jsonKey);
             logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
-
-            //Adding numberinwords- before value to play it in words
-//            value = "numberinwords-" + value;
-//            logger.info("Added numberinwords- Before value to play it in words");
 
             return createSimpleResponse(namespace, operationName, value);
 
