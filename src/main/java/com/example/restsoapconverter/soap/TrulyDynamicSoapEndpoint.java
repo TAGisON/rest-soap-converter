@@ -1,4 +1,3 @@
-
 package com.example.restsoapconverter.soap;
 
 import com.example.restsoapconverter.entity.SoapEndpoint;
@@ -24,6 +23,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * TrulyDynamicSoapEndpoint with PREFIX SYSTEM
+ * <p>
+ * PREFIX RULES:
+ * - amount-XXX → Numeric/monetary values (gross_entitlement, gross_deductions, net_pay, PF balances, subscriptions)
+ * - date-XXX → Date fields in epoch seconds (dob, rnkdt, p_enrldate, irla_next_incr_date)
+ * - letters-XXX → Text/alphanumeric (pan_no, regime, aadhar_no, service checks 0/1, TPIN checks 0/1)
+ * <p>
+ * CHANGES from previous version:
+ * 1. Added determinePrefixForField() method
+ * 2. Added createSimpleResponseWithPrefix() method
+ * 3. Updated all handler methods to use prefix system
+ * 4. Preserved legacy createSimpleResponse() for complex responses
+ */
 @Endpoint
 @Component
 public class TrulyDynamicSoapEndpoint {
@@ -36,6 +49,103 @@ public class TrulyDynamicSoapEndpoint {
 
     @Autowired
     private ExecutionEngineService executionEngineService;
+
+    // ============= NEW PREFIX SYSTEM METHODS =============
+
+    /**
+     * Determine the appropriate prefix for a field based on its type
+     *
+     * @param fieldName   The name of the field
+     * @param isDateField Whether this is a date field
+     * @return The prefix string: "amount-", "date-", or "letters-"
+     */
+    private String determinePrefixForField(String fieldName, boolean isDateField) {
+        // DATE FIELDS (epoch seconds)
+        if (isDateField ||
+                fieldName.equals("dob") ||
+                fieldName.equals("rnkdt") ||
+                fieldName.equals("p_enrldate") ||
+                fieldName.equals("irla_next_incr_date")) {
+            logger.debug("🔍 Field '{}' identified as DATE field", fieldName);
+            return "date-";
+        }
+
+        // AMOUNT FIELDS (numeric/monetary)
+        if (fieldName.equals("gross_entitlement") ||
+                fieldName.equals("gross_deductions") ||
+                fieldName.equals("net_pay") ||
+                fieldName.equals("cl_bal_pf_non_taxable") ||
+                fieldName.equals("cl_bal_pf_taxable") ||
+                fieldName.equals("pf_sub")) {
+            logger.debug("🔍 Field '{}' identified as AMOUNT field", fieldName);
+            return "amount-";
+        }
+
+        // LETTERS FIELDS (text/alphanumeric) - everything else
+        // This includes: pan_no, regime, aadhar_no, service check (0/1), TPIN check (0/1)
+        logger.debug("🔍 Field '{}' identified as LETTERS field", fieldName);
+        return "letters-";
+    }
+
+    /**
+     * Create SOAP response with appropriate prefix based on field type
+     *
+     * @param namespace     The SOAP namespace
+     * @param operationName The operation name
+     * @param returnValue   The raw value to return
+     * @param fieldName     The field name to determine prefix type
+     * @param isDateField   Whether this is a date field
+     * @return SOAP response element with prefixed value
+     */
+    private Element createSimpleResponseWithPrefix(String namespace, String operationName,
+                                                   String returnValue, String fieldName, boolean isDateField) {
+        try {
+            // Determine appropriate prefix
+            String prefix = determinePrefixForField(fieldName, isDateField);
+
+            // Apply prefix to return value
+            String prefixedValue = prefix + returnValue;
+
+            logger.info("✅ Applying prefix '{}' to value '{}' → '{}'", prefix, returnValue, prefixedValue);
+
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.newDocument();
+
+            // Create response element: <OperationNameResponse>
+            Element response = doc.createElementNS(namespace, operationName + "Response");
+            doc.appendChild(response);
+
+            // Create return element: <return>prefix-value</return>
+            Element returnElement = doc.createElement("return");
+            returnElement.setTextContent(prefixedValue);
+            response.appendChild(returnElement);
+
+            logger.info("✅ Created prefixed response for {}: {}", operationName, prefixedValue);
+            return response;
+        } catch (Exception e) {
+            logger.error("❌ Error creating prefixed response: {}", e.getMessage(), e);
+            // Return minimal error response with prefix
+            try {
+                String prefix = determinePrefixForField(fieldName, isDateField);
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                Document doc = builder.newDocument();
+                Element response = doc.createElementNS(namespace, operationName + "Response");
+                doc.appendChild(response);
+                Element returnElement = doc.createElement("return");
+                returnElement.setTextContent(prefix + "-1"); // Error with prefix
+                response.appendChild(returnElement);
+                return response;
+            } catch (Exception ex) {
+                logger.error("❌ Critical error creating error response: {}", ex.getMessage());
+                throw new RuntimeException("Failed to create SOAP response", ex);
+            }
+        }
+    }
+
+    // ============= ENDPOINT REGISTRATION =============
 
     public void registerEndpoint(SoapEndpoint endpoint) {
         String key = endpoint.getNamespace() + "#" + endpoint.getOperationName();
@@ -197,7 +307,7 @@ public class TrulyDynamicSoapEndpoint {
         return handleTPINCheckRequestWithCategory(request, "http://afcao.tpin.cpw.check.service", "CheckTPINCPW", "2");
     }
 
-    // ============= NEW PF (PROVIDENT FUND) ENDPOINTS =============
+    // ============= PF (PROVIDENT FUND) ENDPOINTS =============
 
     // OPW PF ENDPOINTS
     @SoapAction("http://afcao.pf.opw.balancenontaxable.service/GetPFBalanceNonTaxableOPW")
@@ -298,7 +408,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.regime.service", "GetPFRegimeCPW", "regime", "2");
     }
 
-    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR OPW =============
+    // ============= PAYSLIP ELEMENT ENDPOINTS FOR OPW =============
 
     @SoapAction("http://afcao.payslip.opw.pan.service/GetPANOPW")
     @PayloadRoot(namespace = "http://afcao.payslip.opw.pan.service", localPart = "GetPANOPWRequest")
@@ -348,7 +458,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.aadhar.service", "GetAadharLastFourOPW", "aadhar_no", "0", false);
     }
 
-    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR APW =============
+    // ============= PAYSLIP ELEMENT ENDPOINTS FOR APW =============
 
     @SoapAction("http://afcao.payslip.apw.pan.service/GetPANAPW")
     @PayloadRoot(namespace = "http://afcao.payslip.apw.pan.service", localPart = "GetPANAPWRequest")
@@ -398,7 +508,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.apw.aadhar.service", "GetAadharLastFourAPW", "aadhar_no", "1", false);
     }
 
-    // ============= NEW PAYSLIP ELEMENT ENDPOINTS FOR CPW =============
+    // ============= PAYSLIP ELEMENT ENDPOINTS FOR CPW =============
 
     @SoapAction("http://afcao.payslip.cpw.pan.service/GetPANCPW")
     @PayloadRoot(namespace = "http://afcao.payslip.cpw.pan.service", localPart = "GetPANCPWRequest")
@@ -448,7 +558,7 @@ public class TrulyDynamicSoapEndpoint {
         return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.aadhar.service", "GetAadharLastFourCPW", "aadhar_no", "2", false);
     }
 
-    // ============= PAYSLIP ELEMENT PROCESSING LOGIC =============
+    // ============= PAYSLIP ELEMENT PROCESSING LOGIC (UPDATED WITH PREFIX) =============
 
     private Element handlePayslipElementRequestWithCategory(Element request, String namespace, String operationName, String jsonKey, String category, boolean isDateField) {
         try {
@@ -461,7 +571,7 @@ public class TrulyDynamicSoapEndpoint {
 
             if (!parameters.containsKey("serviceNumber")) {
                 logger.error("❌ Missing required parameter: serviceNumber");
-                return createSimpleResponse(namespace, operationName, "-1");
+                return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, isDateField);
             }
 
             // For PAYSLIP_ELEMENT API, we use serviceNumber directly instead of category
@@ -476,7 +586,7 @@ public class TrulyDynamicSoapEndpoint {
             if (endpoint == null) {
                 logger.error("❌ No registered endpoint found for: {}", key);
                 logger.info("Available endpoints: {}", registeredEndpoints.keySet());
-                return createSimpleResponse(namespace, operationName, "-1");
+                return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, isDateField);
             }
 
             // For PAYSLIP_ELEMENT API, we pass serviceNumber and category
@@ -490,11 +600,11 @@ public class TrulyDynamicSoapEndpoint {
             String value = extractPayslipElementValue(result, jsonKey, isDateField);
             logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
 
-            return createSimpleResponse(namespace, operationName, value);
+            return createSimpleResponseWithPrefix(namespace, operationName, value, jsonKey, isDateField);
 
         } catch (Exception e) {
             logger.error("❌ Error processing payslip element request {}: {}", operationName, e.getMessage(), e);
-            return createSimpleResponse(namespace, operationName, "-1");
+            return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, isDateField);
         }
     }
 
@@ -631,7 +741,7 @@ public class TrulyDynamicSoapEndpoint {
         }
     }
 
-    // ============= TPIN CHECK PROCESSING LOGIC =============
+    // ============= TPIN CHECK PROCESSING LOGIC (UPDATED WITH PREFIX) =============
 
     private Element handleTPINCheckRequestWithCategory(Element request, String namespace, String operationName, String category) {
         try {
@@ -680,7 +790,7 @@ public class TrulyDynamicSoapEndpoint {
             if (endpoint == null) {
                 logger.error("❌ No registered endpoint found for: {}", key);
                 logger.info("Available endpoints: {}", registeredEndpoints.keySet());
-                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for endpoint not found
+                return createSimpleResponse(namespace, operationName, "1");
             }
 
             // Execute REST call to get TPIN details
@@ -695,7 +805,7 @@ public class TrulyDynamicSoapEndpoint {
 
         } catch (Exception e) {
             logger.error("❌ Error processing TPIN check request {}: {}", operationName, e.getMessage(), e);
-            return createSimpleResponse(namespace, operationName, "1"); // Return 1 for any error
+            return createSimpleResponse(namespace, operationName, "1");
         }
     }
 
@@ -789,7 +899,7 @@ public class TrulyDynamicSoapEndpoint {
         }
     }
 
-    // ============= SERVICE CHECK PROCESSING LOGIC =============
+    // ============= SERVICE CHECK PROCESSING LOGIC (UPDATED WITH PREFIX) =============
 
     private Element handleServiceCheckRequestWithCategory(Element request, String namespace, String operationName, String category) {
         try {
@@ -801,7 +911,7 @@ public class TrulyDynamicSoapEndpoint {
 
             if (!parameters.containsKey("serviceNumber")) {
                 logger.error("❌ Missing required parameter: serviceNumber");
-                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for missing params
+                return createSimpleResponseWithPrefix(namespace, operationName, "1", "service_check", false);
             }
 
             // Add category automatically based on endpoint type
@@ -815,7 +925,7 @@ public class TrulyDynamicSoapEndpoint {
             if (endpoint == null) {
                 logger.error("❌ No registered endpoint found for: {}", key);
                 logger.info("Available endpoints: {}", registeredEndpoints.keySet());
-                return createSimpleResponse(namespace, operationName, "1"); // Return 1 for endpoint not found
+                return createSimpleResponseWithPrefix(namespace, operationName, "1", "service_check", false);
             }
 
             // Execute REST call
@@ -825,11 +935,11 @@ public class TrulyDynamicSoapEndpoint {
             String checkResult = checkServiceNumberExists(result);
             logger.info("✅ Service check result: {} for category {} (0=found, 1=not found)", checkResult, category);
 
-            return createSimpleResponse(namespace, operationName, checkResult);
+            return createSimpleResponseWithPrefix(namespace, operationName, checkResult, "service_check", false);
 
         } catch (Exception e) {
             logger.error("❌ Error processing service check request {}: {}", operationName, e.getMessage(), e);
-            return createSimpleResponse(namespace, operationName, "1"); // Return 1 for any error
+            return createSimpleResponseWithPrefix(namespace, operationName, "1", "service_check", false);
         }
     }
 
@@ -900,7 +1010,7 @@ public class TrulyDynamicSoapEndpoint {
         }
     }
 
-    // ============= PAYSLIP PROCESSING LOGIC =============
+    // ============= PAYSLIP PROCESSING LOGIC (UPDATED WITH PREFIX) =============
 
     private Element handlePayslipRequestWithCategory(Element request, String namespace, String operationName, String jsonKey, String category) {
         try {
@@ -912,7 +1022,7 @@ public class TrulyDynamicSoapEndpoint {
 
             if (!parameters.containsKey("serviceNumber")) {
                 logger.error("❌ Missing required parameter: serviceNumber");
-                return createSimpleResponse(namespace, operationName, "-1");
+                return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, false);
             }
 
             // Add category automatically based on endpoint type
@@ -926,7 +1036,7 @@ public class TrulyDynamicSoapEndpoint {
             if (endpoint == null) {
                 logger.error("❌ No registered endpoint found for: {}", key);
                 logger.info("Available endpoints: {}", registeredEndpoints.keySet());
-                return createSimpleResponse(namespace, operationName, "-1");
+                return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, false);
             }
 
             // Execute REST call
@@ -936,11 +1046,11 @@ public class TrulyDynamicSoapEndpoint {
             String value = extractPayslipValue(result, jsonKey);
             logger.info("✅ Extracted {} value: {} for category {}", jsonKey, value, category);
 
-            return createSimpleResponse(namespace, operationName, value);
+            return createSimpleResponseWithPrefix(namespace, operationName, value, jsonKey, false);
 
         } catch (Exception e) {
             logger.error("❌ Error processing payslip request with category {}: {}", operationName, e.getMessage(), e);
-            return createSimpleResponse(namespace, operationName, "-1");
+            return createSimpleResponseWithPrefix(namespace, operationName, "-1", jsonKey, false);
         }
     }
 
@@ -998,6 +1108,12 @@ public class TrulyDynamicSoapEndpoint {
         }
     }
 
+    // ============= LEGACY createSimpleResponse FOR COMPLEX RESPONSES (NO PREFIX) =============
+
+    /**
+     * Legacy method for backward compatibility (no prefix)
+     * Used by personnel and rank history endpoints that return complex responses
+     */
     private Element createSimpleResponse(String namespace, String operationName, String returnValue) {
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -1014,7 +1130,7 @@ public class TrulyDynamicSoapEndpoint {
             returnElement.setTextContent(returnValue);
             response.appendChild(returnElement);
 
-            logger.info("✅ Created simple response for {}: {}", operationName, returnValue);
+            logger.info("✅ Created simple response (no prefix) for {}: {}", operationName, returnValue);
             return response;
 
         } catch (Exception e) {
