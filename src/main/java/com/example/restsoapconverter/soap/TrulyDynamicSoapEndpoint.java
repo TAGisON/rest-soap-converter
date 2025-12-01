@@ -431,7 +431,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetRankDateOPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetRankDateOPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.rankdate.service", "GetRankDateOPW", "rnkdt", "0", true);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.rankdate.service", "GetRankDateOPW", "rank_dt", "0", true);
     }
 
     @SoapAction("http://afcao.payslip.opw.enrollmentdate.service/GetEnrollmentDateOPW")
@@ -439,7 +439,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetEnrollmentDateOPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetEnrollmentDateOPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.enrollmentdate.service", "GetEnrollmentDateOPW", "p_enrldate", "0", true);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.enrollmentdate.service", "GetEnrollmentDateOPW", "com_dt", "0", true);
     }
 
     @SoapAction("http://afcao.payslip.opw.nextincrementdate.service/GetNextIncrementDateOPW")
@@ -447,7 +447,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetNextIncrementDateOPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetNextIncrementDateOPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.nextincrementdate.service", "GetNextIncrementDateOPW", "irla_next_incr_date", "0", true);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.opw.nextincrementdate.service", "GetNextIncrementDateOPW", "dni", "0", true);
     }
 
     @SoapAction("http://afcao.payslip.opw.aadhar.service/GetAadharLastFourOPW")
