@@ -381,7 +381,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetPFBalanceNonTaxableCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetPFBalanceNonTaxableCPW request");
-        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancenontaxable.service", "GetPFBalanceNonTaxableCPW", "cl_bal_pf_non_taxable", "2");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancenontaxable.service", "GetPFBalanceNonTaxableCPW", "gpf_cl_bal_non_taxable", "2");
     }
 
     @SoapAction("http://afcao.pf.cpw.balancetaxable.service/GetPFBalanceTaxableCPW")
@@ -389,7 +389,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetPFBalanceTaxableCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetPFBalanceTaxableCPW request");
-        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancetaxable.service", "GetPFBalanceTaxableCPW", "cl_bal_pf_taxable", "2");
+        return handlePayslipRequestWithCategory(request, "http://afcao.pf.cpw.balancetaxable.service", "GetPFBalanceTaxableCPW", "gpf_cl_bal_taxable", "2");
     }
 
     @SoapAction("http://afcao.pf.cpw.subscription.service/GetPFSubscriptionCPW")
@@ -515,7 +515,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetPANCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetPANCPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.pan.service", "GetPANCPW", "pan_no", "2", false);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.pan.service", "GetPANCPW", "pan", "2", false);
     }
 
     @SoapAction("http://afcao.payslip.cpw.dob.service/GetDOBCPW")
@@ -539,7 +539,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetEnrollmentDateCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetEnrollmentDateCPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.enrollmentdate.service", "GetEnrollmentDateCPW", "p_enrldate", "2", true);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.enrollmentdate.service", "GetEnrollmentDateCPW", "apptdt", "2", true);
     }
 
     @SoapAction("http://afcao.payslip.cpw.nextincrementdate.service/GetNextIncrementDateCPW")
@@ -547,7 +547,7 @@ public class TrulyDynamicSoapEndpoint {
     @ResponsePayload
     public Element handleGetNextIncrementDateCPWRequest(@RequestPayload Element request) throws Exception {
         logger.info("🎯 Handling GetNextIncrementDateCPW request");
-        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.nextincrementdate.service", "GetNextIncrementDateCPW", "irla_next_incr_date", "2", true);
+        return handlePayslipElementRequestWithCategory(request, "http://afcao.payslip.cpw.nextincrementdate.service", "GetNextIncrementDateCPW", "irla_calculated_incr_date", "2", true);
     }
 
     @SoapAction("http://afcao.payslip.cpw.aadhar.service/GetAadharLastFourCPW")
